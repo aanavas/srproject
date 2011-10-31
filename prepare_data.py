@@ -65,7 +65,7 @@ def prepare_files(task, raw_paths, files, name, transcriptions, replace):
 
         task_path = task_wav.replace('.sph', '')
         ids_file.write('%s\n' % task_path)
-        trn_file.write('<s> %s </s> (%s)\n' % (transcriptions[task_wav], task_path))
+        trn_file.write('<S> %s </S> (%s)\n' % (transcriptions[task_wav], task_path))
         
     ids_file.close()
     trn_file.close()
@@ -143,7 +143,7 @@ def prepare_data(dialect, ctype, task, replace):
     task_txt = codecs.open(task_txt_filename, 'w', 'utf-8')
     utrans = set(transcriptions.itervalues())
     for trans in utrans:
-        task_txt.write('%s\n' % trans)
+        task_txt.write('<S> %s </S>\n' % trans)
     task_txt.close()
 
     prepare_files(task, raw_paths, train_files, 'train', transcriptions, replace)
