@@ -15,7 +15,11 @@ def get_transcription(filename):
     ifile = codecs.open(filename, 'r', 'utf-8')
     data = ifile.read().split(" --#-- ")
     ifile.close()
-    trans = escape_str(data[1].strip())
+    try:
+        trans = escape_str(data[1].strip())
+    except Exception:
+        print 'ERROR: Transcription not found in:', filename
+        return '--#--'
     return trans
 
 def get_lexicon(filename, phones):
@@ -90,6 +94,7 @@ def prepare_data(dialect, ctype, task, replace):
     for session in sorted(os.listdir(raw_audio_dir)):
         session_dir = os.path.join(raw_audio_dir, session)
         for wav in sorted(os.listdir(session_dir)):
+            if not wav.endswith('0'): continue
             raw_path = os.path.join(session_dir, wav)
             task_wav = session + '_' + wav + '.sph' 
         
