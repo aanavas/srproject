@@ -45,6 +45,7 @@ if ($interact) {
 	require "$module";
 
     my $input = $ARGV[1];
+    my $dialect = $ARGV[2];
     open (IN, $input) || die "can't open $input: $!\n";
 
     my $gw = 0; my $pc; my $wc; my $gp;
@@ -54,7 +55,7 @@ if ($interact) {
 	$w =~ s/\(.*//;
 	#$w =~ tr/a-z/A-Z/;
 
-	@phones = &l2p(split(//, $w));
+	@phones = &l2p($dialect, split(//, $w));
 	@dphones = split /\s+/, $p;
 
 	my $wgp = 0;
@@ -108,7 +109,9 @@ sub cleanup {
 
 sub l2p {
     # the letter-to-phone workhorse
+    my $dialect = $_[0];
     my @letters = @_;
+    shift @letters;
 
     my @orig_letter = @letters;
     push @letters, ('-', '-', '-');
@@ -121,7 +124,9 @@ sub l2p {
 
     for $opos (0..$#orig_letter) {
 	# context2phone is the dtree subroutine from the "require"
-	$res = &context2phone(@letters[$opos..$opos+6]);
+	my @features = @letters[$opos..$opos+6];
+	unshift @features, $dialect;
+	$res = &context2phone(@features);
 	push @phones, $res;
     }
 

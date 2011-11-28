@@ -45,42 +45,25 @@ if ($interact) {
 	require "$module";
 
     my $input = $ARGV[1];
+    my $dialect = $ARGV[2];
     open (IN, $input) || die "can't open $input: $!\n";
 
     my $gw = 0; my $pc; my $wc; my $gp;
     while (<IN>) {
 	chomp;
-	($w, $p) = split /\s+/, $_, 2;
+	($orig, $w, $p) = split /\s+/, $_, 3;
 	$w =~ s/\(.*//;
 	#$w =~ tr/a-z/A-Z/;
 
-	@phones = &l2p(split(//, $w));
-	@dphones = split /\s+/, $p;
-
-	my $wgp = 0;
-	foreach (0..$#phones) {
-	    $wgp += ($phones[$_] eq $dphones[$_]);
-	    $pc++;
-	}
-
-	$gp += $wgp;
-#	print "$w $wgp ".scalar(@phones)."\n";
-	if ($wgp == @phones) {
-	    $gw++;
-#	    print "\n\ngood word: $w\n\n";
-	}
-	$wc++;
-
-	if (!($wc % 500)) {
-	    printf "$wc %0.2f %0.2f\t$w $p", ($gp/$pc), ($gw/$wc);
-	    $ph = join(" ", @phones);
-	    print "/ $ph" unless $ph eq $p;
-	    print "\n";
-	}
-	
+	@phones = &l2p($dialect, split(//, $w));
+	print "$orig $w";
+	foreach $ph (@phones) {
+	    if ($ph ne "_") {
+		    print " $ph";
+		}
+	} 
+	print "\n";
     }
-
-    printf "$wc %0.2f %0.2f\n", ($gp/$pc), ($gw/$wc);
 
     close IN;
 }
@@ -108,7 +91,9 @@ sub cleanup {
 
 sub l2p {
     # the letter-to-phone workhorse
+    my $dialect = $_[0];
     my @letters = @_;
+    shift @letters;
 
     my @orig_letter = @letters;
     push @letters, ('-', '-', '-');
@@ -121,7 +106,9 @@ sub l2p {
 
     for $opos (0..$#orig_letter) {
 	# context2phone is the dtree subroutine from the "require"
-	$res = &context2phone(@letters[$opos..$opos+6]);
+	my @features = @letters[$opos..$opos+6];
+	unshift @features, $dialect;
+	$res = &context2phone(@features);
 	push @phones, $res;
     }
 

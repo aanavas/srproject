@@ -123,12 +123,12 @@ sub getDictionary {
 		my $w = $1;  
 		my $p = $2;
 
-		if ($w =~ /\W/) {
-		    if ($verbosity > 1)  {
-			print "rejecting $w (contains non-word char)\n";
-		    }
-		    next;
-		}
+		#if ($w =~ /\W/) {
+		#    if ($verbosity > 1)  {
+		#	print "rejecting $w (contains non-word char)\n";
+		#    }
+		#    next;
+		#}
 
 		if ($w && $p) {
 		    &addContext($w, $p);
@@ -190,12 +190,12 @@ sub addContext {
 
     $origword = $word;
     $word =~ s/(\S)\(.*/$1/; # stript pron numbers
-    $word =~ tr/a-z/A-Z/;    # upcase
+    #$word =~ tr/a-z/A-Z/;    # upcase
 
     my @letter = split(//, $word);
     my @phone  = split(/\s+/, $pron);
 
-    if (@p > @l) {
+    if (@phone > @letter) {
 	# this is a major problem.  in general, @p can be > @l
 	# but this currently rejects that possibility.
 	if ($verbosity) {
